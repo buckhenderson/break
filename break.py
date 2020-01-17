@@ -58,6 +58,12 @@ class Ball:
             self.speed[1] = self.speed[1] * -1
 
 
+def check_paddle(paddle, ball):
+    if (paddle.x_pos - ball.width <= ball.x_pos <= paddle.x_pos + paddle.width) and ball.y_pos >= paddle.y_pos:
+        ball.speed[1] *= -1
+
+
+
 # Setup
 pygame.init()
 
@@ -106,7 +112,7 @@ while not done:
     # Move the object according to the speed vector.
     paddle.move()
     ball.move()
-
+    check_paddle(paddle, ball)
 
     # --- Drawing Code
 
