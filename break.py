@@ -13,12 +13,24 @@ RED = (255, 0, 0)
 points_dic = {1: WHITE, 2: GREEN, 3: RED}
 target_dic = {}
 
+def get_target_area(target_dic):
+    target_area = {}
+    for key in target_dic:
+        upper_xy = (target_dic[key].x_pos, target_dic[key].y_pos)
+        lower_xy = (target_dic[key].x_pos + target_dic[key].width, target_dic[key].y_pos + target_dic[key].height)
+        target_area[key] = (upper_xy, lower_xy)
+    return target_area
 
-def populate_screen(level=1):
+
+def initialize_screen(level=1):
     if level == 1:
         for i in range(10):
-            target_dic[i] = Target(70*i, 50, 1, i)
-            target_dic[i].draw(screen)
+            target_dic[i] = Target(70 * i, 50, 2, i)
+
+
+def populate_screen(level=1):
+    for key in target_dic:
+        target_dic[key].draw(screen)
 
 
 class Target:
@@ -36,11 +48,12 @@ class Target:
         pygame.draw.rect(screen, self.color, [self.x_pos + 2, self.y_pos + 2, self.width - 4, self.height - 4])
 
     def collision(self):
+        print('collision! on key {}'.format(self.key))
         self.points -= 1
         if self.points == 0:
             target_dic.pop(self.key)
             return
-        self.color = points_dic[points]
+        self.color = points_dic[self.points]
 
 
 class Paddle:
@@ -96,7 +109,16 @@ def check_paddle(paddle, ball):
     if (paddle.x_pos - ball.width <= ball.x_pos <= paddle.x_pos + paddle.width) and ball.y_pos >= paddle.y_pos:
         ball.speed[1] *= -1
 
+
+def check_target(target_area, ball):
+    for key in list(target_dic.keys()):
+        if (target_dic[key].x_pos - ball.width <= ball.x_pos <= target_dic[key].x_pos + paddle.width) and ball.y_pos <= target_dic[key].y_pos:
+            target_dic[key].collision()
+
+
 # Setup
+
+
 pygame.init()
 
 # Set the width and height of the screen [width,height]
@@ -116,10 +138,11 @@ pygame.mouse.set_visible(0)
 
 paddle = Paddle()
 ball = Ball()
-
-
+initialize_screen(1)
+i = 0
 # -------- Main Program Loop -----------
 while not done:
+    i += 1
     # --- Event Processing
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -141,11 +164,16 @@ while not done:
                 paddle.speed = 0
 
     # --- Game Logic
-
+    target_area = get_target_area(target_dic)
+    if i % 10 == 0:
+        print(target_area)
+        print('{}, {}'.format(ball.x_pos, ball.y_pos))
     # Move the object according to the speed vector.
     paddle.move()
     ball.move()
     check_paddle(paddle, ball)
+    check_target(target_area, ball)
+
 
     # --- Drawing Code
 
