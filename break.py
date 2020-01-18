@@ -5,8 +5,42 @@ import math
 # Define some colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
+OFFWHITE = (237, 240, 245)
+LIGHTBLUE = (73, 122, 204)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
+
+points_dic = {1: WHITE, 2: GREEN, 3: RED}
+target_dic = {}
+
+
+def populate_screen(level=1):
+    if level == 1:
+        for i in range(10):
+            target_dic[i] = Target(70*i, 50, 1, i)
+            target_dic[i].draw(screen)
+
+
+class Target:
+    def __init__(self, x_pos, y_pos, points, key, width=70, height=10):
+        self.points = points
+        self.x_pos = x_pos
+        self.y_pos = y_pos
+        self.width = width
+        self.height = height
+        self.color = points_dic[self.points]
+        self.key = key
+
+    def draw(self, screen):
+        pygame.draw.rect(screen, LIGHTBLUE, [self.x_pos, self.y_pos, self.width, self.height])
+        pygame.draw.rect(screen, self.color, [self.x_pos + 2, self.y_pos + 2, self.width - 4, self.height - 4])
+
+    def collision(self):
+        self.points -= 1
+        if self.points == 0:
+            target_dic.pop(self.key)
+            return
+        self.color = points_dic[points]
 
 
 class Paddle:
@@ -62,8 +96,6 @@ def check_paddle(paddle, ball):
     if (paddle.x_pos - ball.width <= ball.x_pos <= paddle.x_pos + paddle.width) and ball.y_pos >= paddle.y_pos:
         ball.speed[1] *= -1
 
-
-
 # Setup
 pygame.init()
 
@@ -84,6 +116,7 @@ pygame.mouse.set_visible(0)
 
 paddle = Paddle()
 ball = Ball()
+
 
 # -------- Main Program Loop -----------
 while not done:
@@ -119,7 +152,7 @@ while not done:
     # First, clear the screen to WHITE. Don't put other drawing commands
     # above this, or they will be erased with this command.
     screen.fill(BLACK)
-
+    populate_screen(1)
     paddle.draw(screen)
     ball.draw(screen)
 
