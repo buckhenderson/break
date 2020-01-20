@@ -55,9 +55,9 @@ class Target:
         pygame.draw.rect(screen, self.color, [self.x_pos + 2, self.y_pos + 2, self.width - 4, self.height - 4])
 
     def collision(self):
-        print('collision! on key {}'.format(self.key))
-        print('upper x:{}, upper y:{}, lower x:{}, lower y:{}'.format(self.x_pos, self.y_pos, self.x_pos +
-                                                                      self.width, self.y_pos + self.height))
+        # print('collision! on key {}'.format(self.key))
+        # print('upper x:{}, upper y:{}, lower x:{}, lower y:{}'.format(self.x_pos, self.y_pos, self.x_pos +
+        #                                                               self.width, self.y_pos + self.height))
         self.points -= 1
         if self.points == 0:
             target_dic.pop(self.key)
@@ -122,10 +122,10 @@ def check_paddle(paddle, ball):
 def check_target(target_area, ball):
     collision = False
     for key in list(target_dic.keys()):
-        if (target_dic[key].x_pos - ball.width <= ball.x_pos <= target_dic[key].x_pos + ball.width) \
+        if (target_dic[key].x_pos - ball.width <= ball.x_pos <= target_dic[key].x_pos + ball.width + target_dic[key].width) \
                 and ball.y_pos <= target_dic[key].y_pos + target_dic[key].height:
             # print('collision detected')
-            print('ball location: x_pos = {}, y_pos = {}'.format(ball.x_pos, ball.y_pos))
+            # print('ball location: x_pos = {}, y_pos = {}'.format(ball.x_pos, ball.y_pos))
             # print('test used to detect collision:')
             # print('(target_dic[key].x_pos - ball.width <= ball.x_pos <= target_dic[key].x_pos + paddle.width) and ball.y_pos <= target_dic[key].y_pos + target_dic[key].height')
             # print('subbed values:')
@@ -190,7 +190,7 @@ while not done:
     check_paddle(paddle, ball)
     result = check_target(target_area, ball)
     if result:
-        print('flipped')
+        # print('flipped')
         ball.speed[1] *= -1
     ball.move()
 
@@ -210,11 +210,11 @@ while not done:
 
     # for debugging, we want to print
 
-    if i % 5 == 0:
-        dateTimeObj = datetime.now()
-        timestampStr = dateTimeObj.strftime("%m_%d_%Y_%H_%M_%S_%f")
-        print('{}, x: {}, y: {}'.format(timestampStr, ball.x_pos, ball.y_pos))
-        pygame.image.save(screen, "C:/breakout/screenshot" + timestampStr + ".jpg")
+    # if i % 5 == 0:
+    #     dateTimeObj = datetime.now()
+    #     timestampStr = dateTimeObj.strftime("%m_%d_%Y_%H_%M_%S_%f")
+    #     print('{}, x: {}, y: {}'.format(timestampStr, ball.x_pos, ball.y_pos))
+    #     pygame.image.save(screen, "C:/breakout/screenshot" + timestampStr + ".jpg")
 
     # Limit frames per second
     clock.tick(60)
