@@ -21,6 +21,28 @@ RED = (255, 0, 0)
 size = [700, 500]
 points_dic = {1: WHITE, 2: GREEN, 3: RED}
 target_dic = {}
+reset = False
+lives = 1
+
+def reset_game(screen):
+    font = pygame.font.Font('freesansbold.ttf', 32)
+    text1 = font.render('GAME OVER', True, WHITE, BLACK)
+    text2 = font.render('A TO RESTART', True, WHITE, BLACK)
+    text3 = font.render('X TO EXIT', True, WHITE, BLACK)
+    text1_rect = text1.get_rect()
+    text2_rect = text2.get_rect()
+    text3_rect = text3.get_rect()
+    screen.fill(BLACK)
+    text1_rect.center = size[0]/2, size[1]/2 - 100
+    text2_rect.center = size[0]/2, size[1]/2
+    text3_rect.center = size[0]/2, size[1]/2 + 100
+    screen.blit(text1, text1_rect)
+    screen.blit(text2, text2_rect)
+    screen.blit(text3, text3_rect)
+    pygame.display.flip()
+    return True
+
+
 
 def get_target_area(target_dic):
     target_area = {}
@@ -87,7 +109,7 @@ class Paddle:
             self.x_pos = 700 - self.width
 
 class Ball:
-    def __init__(self, x_pos=200, y_pos=200, width=10, height=10, color=WHITE, speed=3, angle=.75*math.pi, lives=3):
+    def __init__(self, x_pos=200, y_pos=200, width=10, height=10, color=WHITE, speed=3, angle=.75*math.pi, lives=1):
         self.x_pos = x_pos
         self.y_pos = y_pos
         self.width = width
@@ -95,7 +117,7 @@ class Ball:
         self.color = color
         self.speed = [speed*math.cos(angle), speed*math.sin(angle)]
         self.angle = angle
-        self.lives = 3
+        self.lives = lives
 
     def check_lose(self):
         return self.y_pos + self.height >= size[1]
@@ -185,6 +207,13 @@ while not done:
                 paddle.speed = -6
             elif event.key == pygame.K_RIGHT:
                 paddle.speed = 6
+            if reset and event.key == pygame.K_a:
+                ball.lives = lives
+                reset = False
+                lose = False
+                ball.reset()
+            if reset and event.key == pygame.K_x:
+                pygame.quit()
 
         # User let up on a key
         elif event.type == pygame.KEYUP:
@@ -194,6 +223,7 @@ while not done:
 
     # --- Game Logic
     lose = ball.check_lose()
+    print(lose)
     if lose:
         time.sleep(1)
         ball.lives -= 1
@@ -222,8 +252,8 @@ while not done:
     populate_screen(1)
     paddle.draw(screen)
     ball.draw(screen)
-
-
+    if lose:
+        reset_game(screen)
     # Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
 
