@@ -1,5 +1,6 @@
 import pygame
 import math
+import time
 from datetime import datetime
 
 # to debug, we'll print to log
@@ -17,6 +18,7 @@ LIGHTBLUE = (73, 122, 204)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 
+size = [700, 500]
 points_dic = {1: WHITE, 2: GREEN, 3: RED}
 target_dic = {}
 
@@ -85,7 +87,7 @@ class Paddle:
             self.x_pos = 700 - self.width
 
 class Ball:
-    def __init__(self, x_pos=200, y_pos=200, width=10, height=10, color=WHITE, speed=3, angle=.75*math.pi):
+    def __init__(self, x_pos=200, y_pos=200, width=10, height=10, color=WHITE, speed=3, angle=.75*math.pi, lives=3):
         self.x_pos = x_pos
         self.y_pos = y_pos
         self.width = width
@@ -93,6 +95,15 @@ class Ball:
         self.color = color
         self.speed = [speed*math.cos(angle), speed*math.sin(angle)]
         self.angle = angle
+        self.lives = 3
+
+    def check_lose(self):
+        return self.y_pos + self.height >= size[1]
+
+    def reset(self):
+        self.x_pos = 200
+        self.y_pos = 200
+        self.angle = .75*math.pi
 
     def draw(self, screen):
         pygame.draw.rect(screen, self.color, [self.x_pos, self.y_pos, self.width, self.height])
@@ -140,7 +151,7 @@ def check_target(target_area, ball):
 pygame.init()
 
 # Set the width and height of the screen [width,height]
-size = [700, 500]
+
 screen = pygame.display.set_mode(size)
 
 pygame.display.set_caption("My Game")
@@ -182,17 +193,25 @@ while not done:
                 paddle.speed = 0
 
     # --- Game Logic
-    target_area = get_target_area(target_dic)
+    lose = ball.check_lose()
+    if lose:
+        time.sleep(1)
+        ball.lives -= 1
+        if ball.lives > 0:
+            ball.reset()
+    else:
+        target_area = get_target_area(target_dic)
 
-    # Move the object according to the speed vector.
-    paddle.move()
-    # ball.move()
-    check_paddle(paddle, ball)
-    result = check_target(target_area, ball)
-    if result:
-        # print('flipped')
-        ball.speed[1] *= -1
-    ball.move()
+        # Move the object according to the speed vector.
+        paddle.move()
+        # ball.move()
+        check_paddle(paddle, ball)
+
+        result = check_target(target_area, ball)
+        if result:
+            # print('flipped')
+            ball.speed[1] *= -1
+        ball.move()
 
 
     # --- Drawing Code
