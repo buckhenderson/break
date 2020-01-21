@@ -62,6 +62,9 @@ def initialize_screen(level=1):
 def populate_screen(level=1):
     for key in target_dic:
         target_dic[key].draw(screen)
+    pygame.draw.rect(screen, WHITE, [0, size[1] - 20, size[0], 10])
+    for i in range(0, ball.lives - 1):
+        pygame.draw.circle(screen, WHITE, (5 + 10*i, size[1] - 5), 5)
 
 
 class Target:
@@ -109,7 +112,7 @@ class Paddle:
             self.x_pos = 700 - self.width
 
 class Ball:
-    def __init__(self, x_pos=200, y_pos=200, width=10, height=10, color=WHITE, speed=3, angle=.75*math.pi, lives=1):
+    def __init__(self, x_pos=200, y_pos=200, width=10, height=10, color=WHITE, speed=3, angle=.75*math.pi, lives=3):
         self.x_pos = x_pos
         self.y_pos = y_pos
         self.width = width
@@ -120,7 +123,7 @@ class Ball:
         self.lives = lives
 
     def check_lose(self):
-        return self.y_pos + self.height >= size[1]
+        return self.y_pos + self.height >= size[1] - 20
 
     def reset(self):
         self.x_pos = 200
