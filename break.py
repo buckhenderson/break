@@ -213,7 +213,7 @@ while not done:
                 lose = False
                 ball.reset()
             if reset and event.key == pygame.K_x:
-                pygame.quit()
+                done = True
 
         # User let up on a key
         elif event.type == pygame.KEYUP:
@@ -223,7 +223,6 @@ while not done:
 
     # --- Game Logic
     lose = ball.check_lose()
-    print(lose)
     if lose:
         time.sleep(1)
         ball.lives -= 1
@@ -253,7 +252,7 @@ while not done:
     paddle.draw(screen)
     ball.draw(screen)
     if lose:
-        reset_game(screen)
+        reset = reset_game(screen)
     # Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
 
