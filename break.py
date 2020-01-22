@@ -23,6 +23,7 @@ points_dic = {1: WHITE, 2: GREEN, 3: RED}
 target_dic = {}
 reset = False
 lives = 1
+score = 0
 
 def reset_game(screen):
     font = pygame.font.Font('freesansbold.ttf', 32)
@@ -42,7 +43,12 @@ def reset_game(screen):
     pygame.display.flip()
     return True
 
-
+def print_score():
+    font = pygame.font.Font('freesansbold.ttf', 10)
+    score_text = font.render('{}'.format(score), True, WHITE, BLACK)
+    score_text_rect = score_text.get_rect()
+    score_text_rect.center = size[0]/2, 495
+    screen.blit(score_text, score_text_rect)
 
 def get_target_area(target_dic):
     target_area = {}
@@ -156,6 +162,7 @@ def check_paddle(paddle, ball):
 
 
 def check_target(target_area, ball):
+    global score
     collision = False
     for key in list(target_dic.keys()):
         if (target_dic[key].x_pos - ball.width <= ball.x_pos <= target_dic[key].x_pos + ball.width + target_dic[key].width) \
@@ -168,6 +175,7 @@ def check_target(target_area, ball):
             # print('{} - {} <= {} <= {} + {}) and {} <= {} + {}'.format(target_dic[key].x_pos, ball.width, ball.x_pos, target_dic[key].x_pos, paddle.width, ball.y_pos, target_dic[key].y_pos, target_dic[key].height))
             target_dic[key].collision()
             collision = True
+            score += 1
     return collision
 
 
@@ -214,6 +222,7 @@ while not done:
                 ball.lives = lives
                 reset = False
                 lose = False
+                score = 0
                 ball.reset()
             if reset and event.key == pygame.K_x:
                 done = True
@@ -254,6 +263,7 @@ while not done:
     populate_screen(1)
     paddle.draw(screen)
     ball.draw(screen)
+    print_score()
     if lose:
         reset = reset_game(screen)
     # Go ahead and update the screen with what we've drawn.
