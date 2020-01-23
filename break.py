@@ -51,18 +51,22 @@ def print_score():
     screen.blit(score_text, score_text_rect)
 
 def get_target_area(target_dic):
+    # x0 leftmost, x1 rightmost
+    # y0 topmost, y1 bottommost
     target_area = {}
     for key in target_dic:
-        upper_xy = (target_dic[key].x_pos, target_dic[key].y_pos)
-        lower_xy = (target_dic[key].x_pos + target_dic[key].width, target_dic[key].y_pos + target_dic[key].height)
-        target_area[key] = (upper_xy, lower_xy)
+        x0y0 = target_dic[key].x_pos, target_dic[key].y_pos
+        x0y1 = target_dic[key].x_pos, target_dic[key].y_pos + target_dic[key].height
+        x1y0 = target_dic[key].x_pos + target_dic[key].width, target_dic[key].y_pos
+        x1y1 = target_dic[key].x_pos + target_dic[key].width, target_dic[key].y_pos + target_dic[key].height
+        target_area[key] = (x0y0, x0y1, x1y0, x1y1)
     return target_area
 
 
 def initialize_screen(level=1):
     if level == 1:
         for i in range(10):
-            target_dic[i] = Target(70 * i, 50, 1, i)
+            target_dic[i] = Target(70 * i, 50, 2, i)
 
 
 def populate_screen(level=1):
@@ -165,8 +169,9 @@ def check_target(target_area, ball):
     global score
     collision = False
     for key in list(target_dic.keys()):
-        if (target_dic[key].x_pos - ball.width <= ball.x_pos <= target_dic[key].x_pos + ball.width + target_dic[key].width) \
-                and ball.y_pos <= target_dic[key].y_pos + target_dic[key].height:
+        if target_dic[key].x_pos - ball.width <= ball.x_pos <= target_dic[key].x_pos + ball.width + target_dic[key].width \
+                and (target_dic[key].y_pos - ball.height <= ball.y_pos <= target_dic[key].y_pos + target_dic[key].height
+                     or target_dic[key].y_pos + target_dic[key].height <= ball.y_pos <= target_dic[key].y_pos + target_dic[key].height):
             # print('collision detected')
             # print('ball location: x_pos = {}, y_pos = {}'.format(ball.x_pos, ball.y_pos))
             # print('test used to detect collision:')
