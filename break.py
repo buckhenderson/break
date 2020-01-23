@@ -18,6 +18,7 @@ LIGHTBLUE = (73, 122, 204)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 
+paddle_y_pos = 400
 size = [700, 500]
 points_dic = {1: WHITE, 2: GREEN, 3: RED}
 target_dic = {}
@@ -103,7 +104,7 @@ class Target:
 
 
 class Paddle:
-    def __init__(self, x_pos=300, y_pos=400, width=100, height=10, color=WHITE):
+    def __init__(self, x_pos=300, y_pos=paddle_y_pos, width=100, height=10, color=WHITE):
         self.x_pos = x_pos
         self.y_pos = y_pos
         self.width = width
@@ -206,6 +207,14 @@ pygame.mouse.set_visible(0)
 paddle = Paddle()
 ball = Ball()
 initialize_screen(1)
+
+# find target with max y_pos
+max_y_pos = 0
+for key in target_dic:
+    if target_dic[key].y_pos > max_y_pos:
+        max_y_pos = target_dic[key].y_pos + target_dic[key].width - max(20, target_dic[key].width)
+
+
 i = 0
 # -------- Main Program Loop -----------
 while not done:
@@ -251,9 +260,10 @@ while not done:
         # Move the object according to the speed vector.
         paddle.move()
         # ball.move()
-        check_paddle(paddle, ball)
-
-        result = check_target(target_area, ball)
+        if ball.y_pos > paddle.y_pos - 20:
+            check_paddle(paddle, ball)
+        if ball.y_pos > max_y_pos:
+            result = check_target(target_area, ball)
         if result:
             # print('flipped')
             ball.speed[1] *= -1
