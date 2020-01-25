@@ -168,11 +168,13 @@ def check_paddle(paddle, ball):
 
 def check_target(target_area, ball):
     global score
+    top_bottom = False
+    side = False
     collision = False
     for key in list(target_dic.keys()):
         if target_dic[key].x_pos - ball.width <= ball.x_pos <= target_dic[key].x_pos + ball.width + target_dic[key].width \
-                and (target_dic[key].y_pos - ball.height <= ball.y_pos <= target_dic[key].y_pos + target_dic[key].height
-                     or target_dic[key].y_pos + target_dic[key].height <= ball.y_pos <= target_dic[key].y_pos + target_dic[key].height):
+            and (target_dic[key].y_pos - ball.height <= ball.y_pos <= target_dic[key].y_pos + target_dic[key].height
+                 or target_dic[key].y_pos + target_dic[key].height <= ball.y_pos <= target_dic[key].y_pos + target_dic[key].height):
             # print('collision detected')
             # print('ball location: x_pos = {}, y_pos = {}'.format(ball.x_pos, ball.y_pos))
             # print('test used to detect collision:')
@@ -182,7 +184,15 @@ def check_target(target_area, ball):
             target_dic[key].collision()
             collision = True
             score += 1
-    return collision
+            top_bottom = False
+        if target_dic[key].y_pos - ball.height < ball.y_pos <= target_dic[key].y_pos + target_dic[key].height + ball.height \
+            and (target_dic[key].x_pos - ball.width <= ball.x_pos <= target_dic[key].x_pos
+                 or target_dic[key].x_pos + target_dic[key].width <= ball.x_pos <= target_dic[key].x_pos + target_dic[key].width + ball.width):
+            target_dic[key].collision()
+            score += 1
+            side = True
+            collision = True
+    return collision, top_bottom, side
 
 
 # Setup
@@ -264,9 +274,14 @@ while not done:
             check_paddle(paddle, ball)
         if ball.y_pos > max_y_pos:
             result = check_target(target_area, ball)
-        if result:
+        print(result)
+        if result[0]:
             # print('flipped')
-            ball.speed[1] *= -1
+            if result[1]:
+                ball.speed[1] *= -1
+            if result[2]:
+                ball.speed[0] *= -1
+
         ball.move()
 
 
