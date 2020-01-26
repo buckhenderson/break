@@ -79,7 +79,7 @@ def populate_screen(level=1):
 
 
 class Target:
-    def __init__(self, x_pos, y_pos, points, key, width=70, height=10):
+    def __init__(self, x_pos=0, y_pos=0, points=1, key=0, width=70, height=10):
         self.points = points
         self.x_pos = x_pos
         self.y_pos = y_pos
@@ -177,8 +177,8 @@ def check_target(target_area, ball):
         if target_dic[key].x_pos - ball.width <= ball.x_pos <= target_dic[key].x_pos + ball.width + target_dic[
             key].width and (
                 target_dic[key].y_pos - ball.height <= ball.y_pos <= target_dic[key].y_pos + ball.speed[1] or
-                target_dic[key].y_pos + target_dic[key].height - ball.speed[1] <= ball.y_pos <= target_dic[key].y_pos +
-                target_dic[key].height):
+                target_dic[key].y_pos + target_dic[key].height - abs(ball.speed[1]) <= ball.y_pos <=
+                target_dic[key].y_pos + target_dic[key].height):
             print('collision detected - vertical')
             print('ball location: x_pos = {}, y_pos = {}'.format(ball.x_pos, ball.y_pos))
             print('target location: x_pos = {}, y_pos = {}, width = {}, height = {}'.format(target_dic[key].x_pos,
@@ -325,10 +325,10 @@ while not done:
     # for debugging, we want to print
 
     # if i % 2 == 0:
-    dateTimeObj = datetime.now()
-    timestampStr = dateTimeObj.strftime("%m_%d_%Y_%H_%M_%S_%f")
-    print('{}, x: {}, y: {}'.format(timestampStr, ball.x_pos, ball.y_pos))
-    pygame.image.save(screen, "C:/breakout/screenshot" + timestampStr + ".jpg")
+    # dateTimeObj = datetime.now()
+    # timestampStr = dateTimeObj.strftime("%m_%d_%Y_%H_%M_%S_%f")
+    # print('{}, x: {}, y: {}'.format(timestampStr, ball.x_pos, ball.y_pos))
+    # pygame.image.save(screen, "C:/breakout/screenshot" + timestampStr + ".jpg")
 
     # Limit frames per second
     clock.tick(60)
