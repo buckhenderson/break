@@ -66,7 +66,7 @@ def get_target_area(target_dic):
 
 def initialize_screen(level=1):
     if level == 1:
-        for i in range(10):
+        for i in range(6):
             target_dic[i] = Target(70 * i, 50, 2, i)
 
 
@@ -123,7 +123,7 @@ class Paddle:
             self.x_pos = 700 - self.width
 
 class Ball:
-    def __init__(self, x_pos=200, y_pos=200, width=10, height=10, color=WHITE, speed=3, angle=.75*math.pi, lives=3):
+    def __init__(self, x_pos=600, y_pos=50, width=10, height=10, color=WHITE, speed=5, angle=0*math.pi, lives=3):
         self.x_pos = x_pos
         self.y_pos = y_pos
         self.width = width
@@ -162,37 +162,57 @@ class Ball:
 
 
 def check_paddle(paddle, ball):
-    if (paddle.x_pos - ball.width <= ball.x_pos <= paddle.x_pos + paddle.width) and ball.y_pos + ball.height >= paddle.y_pos:
+    if ball.y_pos + ball.height >= paddle.y_pos:
+    # if (paddle.x_pos - ball.width <= ball.x_pos <= paddle.x_pos + paddle.width) and ball.y_pos + ball.height >= paddle.y_pos:
         ball.speed[1] *= -1
 
 
 def check_target(target_area, ball):
     global score
-    top_bottom = False
-    side = False
+    v, h = 1, 1
     collision = False
     for key in list(target_dic.keys()):
-        if target_dic[key].x_pos - ball.width <= ball.x_pos <= target_dic[key].x_pos + ball.width + target_dic[key].width \
-            and (target_dic[key].y_pos - ball.height <= ball.y_pos <= target_dic[key].y_pos + target_dic[key].height
-                 or target_dic[key].y_pos + target_dic[key].height <= ball.y_pos <= target_dic[key].y_pos + target_dic[key].height):
-            # print('collision detected')
-            # print('ball location: x_pos = {}, y_pos = {}'.format(ball.x_pos, ball.y_pos))
+        collision_0 = False
+        if target_dic[key].x_pos - ball.width <= ball.x_pos <= target_dic[key].x_pos + ball.width + target_dic[
+            key].width and (
+                target_dic[key].y_pos - ball.height <= ball.y_pos <= target_dic[key].y_pos + target_dic[key].height or
+                target_dic[key].y_pos + target_dic[key].height <= ball.y_pos <= target_dic[key].y_pos +
+                target_dic[key].height):
+            print('collision detected - vertical')
+            print('ball location: x_pos = {}, y_pos = {}'.format(ball.x_pos, ball.y_pos))
+            print('target location: x_pos = {}, y_pos = {}, width = {}, height = {}'.format(target_dic[key].x_pos,
+                                                                                            target_dic[key].y_pos,
+                                                                                            target_dic[key].width,
+                                                                                            target_dic[key].height))
             # print('test used to detect collision:')
             # print('(target_dic[key].x_pos - ball.width <= ball.x_pos <= target_dic[key].x_pos + paddle.width) and ball.y_pos <= target_dic[key].y_pos + target_dic[key].height')
             # print('subbed values:')
             # print('{} - {} <= {} <= {} + {}) and {} <= {} + {}'.format(target_dic[key].x_pos, ball.width, ball.x_pos, target_dic[key].x_pos, paddle.width, ball.y_pos, target_dic[key].y_pos, target_dic[key].height))
-            target_dic[key].collision()
+
             collision = True
+            collision_0 = True
             score += 1
-            top_bottom = False
-        if target_dic[key].y_pos - ball.height < ball.y_pos <= target_dic[key].y_pos + target_dic[key].height + ball.height \
+            v = -1
+        if target_dic[key].y_pos - ball.height <= ball.y_pos <= target_dic[key].y_pos + target_dic[key].height \
             and (target_dic[key].x_pos - ball.width <= ball.x_pos <= target_dic[key].x_pos
-                 or target_dic[key].x_pos + target_dic[key].width <= ball.x_pos <= target_dic[key].x_pos + target_dic[key].width + ball.width):
-            target_dic[key].collision()
-            score += 1
-            side = True
+                 or target_dic[key].x_pos + target_dic[key].width - ball.width <= ball.x_pos <= target_dic[key].x_pos + target_dic[key].width + ball.width):
+            print('collision detected - horizontal')
+            print('ball location: x_pos = {}, y_pos = {}'.format(ball.x_pos, ball.y_pos))
+            print('target location: x_pos = {}, y_pos = {}, width = {}, height = {}'.format(target_dic[key].x_pos,
+                                                                                            target_dic[key].y_pos,
+                                                                                            target_dic[key].width,
+                                                                                            target_dic[key].height))
             collision = True
-    return collision, top_bottom, side
+            collision_0 = True
+            score += 1
+            h = -1
+            if target_dic[key].x_pos - ball.width <= ball.x_pos <= target_dic[key].x_pos:
+                print('1')
+            if target_dic[key].x_pos + target_dic[key].width - ball.width <= ball.x_pos <= target_dic[key].x_pos + target_dic[key].width:
+                print('2')
+        if collision_0:
+            target_dic[key].collision()
+    return collision, v, h
 
 
 # Setup
@@ -222,7 +242,7 @@ initialize_screen(1)
 max_y_pos = 0
 for key in target_dic:
     if target_dic[key].y_pos > max_y_pos:
-        max_y_pos = target_dic[key].y_pos + target_dic[key].width - max(20, target_dic[key].width)
+        max_y_pos = target_dic[key].y_pos + target_dic[key].height + max(20, target_dic[key].height)
 
 
 i = 0
@@ -270,18 +290,16 @@ while not done:
         # Move the object according to the speed vector.
         paddle.move()
         # ball.move()
+        result = [False]
         if ball.y_pos > paddle.y_pos - 20:
             check_paddle(paddle, ball)
-        if ball.y_pos > max_y_pos:
+        if ball.y_pos < max_y_pos:
             result = check_target(target_area, ball)
-        print(result)
+            print('calling result')
         if result[0]:
-            # print('flipped')
-            if result[1]:
-                ball.speed[1] *= -1
-            if result[2]:
-                ball.speed[0] *= -1
-
+            print('flipped')
+            ball.speed[1] *= result[1]
+            ball.speed[0] *= result[2]
         ball.move()
 
 
@@ -301,11 +319,11 @@ while not done:
 
     # for debugging, we want to print
 
-    # if i % 5 == 0:
-    #     dateTimeObj = datetime.now()
-    #     timestampStr = dateTimeObj.strftime("%m_%d_%Y_%H_%M_%S_%f")
-    #     print('{}, x: {}, y: {}'.format(timestampStr, ball.x_pos, ball.y_pos))
-    #     pygame.image.save(screen, "C:/breakout/screenshot" + timestampStr + ".jpg")
+    if i % 2 == 0:
+        dateTimeObj = datetime.now()
+        timestampStr = dateTimeObj.strftime("%m_%d_%Y_%H_%M_%S_%f")
+        print('{}, x: {}, y: {}'.format(timestampStr, ball.x_pos, ball.y_pos))
+        pygame.image.save(screen, "C:/breakout/screenshot" + timestampStr + ".jpg")
 
     # Limit frames per second
     clock.tick(60)
