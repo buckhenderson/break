@@ -123,7 +123,7 @@ class Paddle:
             self.x_pos = 700 - self.width
 
 class Ball:
-    def __init__(self, x_pos=600, y_pos=50, width=10, height=10, color=WHITE, speed=5, angle=0*math.pi, lives=3):
+    def __init__(self, x_pos=200, y_pos=200, width=10, height=10, color=WHITE, speed=5, angle=.75*math.pi, lives=3):
         self.x_pos = x_pos
         self.y_pos = y_pos
         self.width = width
@@ -171,12 +171,13 @@ def check_target(target_area, ball):
     global score
     v, h = 1, 1
     collision = False
+    # print('starting list: {}'.format('.'.join([str(x) for x in list(target_dic.keys())])))
     for key in list(target_dic.keys()):
         collision_0 = False
         if target_dic[key].x_pos - ball.width <= ball.x_pos <= target_dic[key].x_pos + ball.width + target_dic[
             key].width and (
-                target_dic[key].y_pos - ball.height <= ball.y_pos <= target_dic[key].y_pos + target_dic[key].height or
-                target_dic[key].y_pos + target_dic[key].height <= ball.y_pos <= target_dic[key].y_pos +
+                target_dic[key].y_pos - ball.height <= ball.y_pos <= target_dic[key].y_pos + ball.speed[1] or
+                target_dic[key].y_pos + target_dic[key].height - ball.speed[1] <= ball.y_pos <= target_dic[key].y_pos +
                 target_dic[key].height):
             print('collision detected - vertical')
             print('ball location: x_pos = {}, y_pos = {}'.format(ball.x_pos, ball.y_pos))
@@ -195,7 +196,7 @@ def check_target(target_area, ball):
             v = -1
         if target_dic[key].y_pos - ball.height <= ball.y_pos <= target_dic[key].y_pos + target_dic[key].height \
             and (target_dic[key].x_pos - ball.width <= ball.x_pos <= target_dic[key].x_pos
-                 or target_dic[key].x_pos + target_dic[key].width - ball.width <= ball.x_pos <= target_dic[key].x_pos + target_dic[key].width + ball.width):
+                 or target_dic[key].x_pos + target_dic[key].width - ball.width <= ball.x_pos <= target_dic[key].x_pos + target_dic[key].width):
             print('collision detected - horizontal')
             print('ball location: x_pos = {}, y_pos = {}'.format(ball.x_pos, ball.y_pos))
             print('target location: x_pos = {}, y_pos = {}, width = {}, height = {}'.format(target_dic[key].x_pos,
@@ -206,12 +207,15 @@ def check_target(target_area, ball):
             collision_0 = True
             score += 1
             h = -1
-            if target_dic[key].x_pos - ball.width <= ball.x_pos <= target_dic[key].x_pos:
-                print('1')
-            if target_dic[key].x_pos + target_dic[key].width - ball.width <= ball.x_pos <= target_dic[key].x_pos + target_dic[key].width:
-                print('2')
+            # if target_dic[key].x_pos - ball.width <= ball.x_pos <= target_dic[key].x_pos:
+            #     print('1')
+            # if target_dic[key].x_pos + target_dic[key].width - ball.width <= ball.x_pos <= target_dic[key].x_pos + target_dic[key].width:
+            #     print('2')
         if collision_0:
+            print('removing target {}'.format(key))
             target_dic[key].collision()
+    print('ending list: {}'.format('.'.join([str(x) for x in list(target_dic.keys())])))
+    print('exiting out of target loop')
     return collision, v, h
 
 
@@ -298,6 +302,7 @@ while not done:
             print('calling result')
         if result[0]:
             print('flipped')
+            print(result)
             ball.speed[1] *= result[1]
             ball.speed[0] *= result[2]
         ball.move()
@@ -319,11 +324,11 @@ while not done:
 
     # for debugging, we want to print
 
-    if i % 2 == 0:
-        dateTimeObj = datetime.now()
-        timestampStr = dateTimeObj.strftime("%m_%d_%Y_%H_%M_%S_%f")
-        print('{}, x: {}, y: {}'.format(timestampStr, ball.x_pos, ball.y_pos))
-        pygame.image.save(screen, "C:/breakout/screenshot" + timestampStr + ".jpg")
+    # if i % 2 == 0:
+    dateTimeObj = datetime.now()
+    timestampStr = dateTimeObj.strftime("%m_%d_%Y_%H_%M_%S_%f")
+    print('{}, x: {}, y: {}'.format(timestampStr, ball.x_pos, ball.y_pos))
+    pygame.image.save(screen, "C:/breakout/screenshot" + timestampStr + ".jpg")
 
     # Limit frames per second
     clock.tick(60)
