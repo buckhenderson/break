@@ -25,6 +25,8 @@ target_dic = {}
 reset = False
 lives = 1
 score = 0
+current_level = 1
+
 
 def reset_game(screen):
     font = pygame.font.Font('freesansbold.ttf', 32)
@@ -64,10 +66,30 @@ def get_target_area(target_dic):
     return target_area
 
 
+def populate_level_1():
+    for i in range(5):
+        target_dic[i] = Target(70 * i, 50, 1, i)
+
+
+def populate_level_2():
+    print('populating level 2')
+    for i in range(10):
+        target_dic[i] = Target(70 * i, 50, 2, i)
+    for i in range(10):
+        target_dic[i] = Target(70 * i, 70, 2, i)
+
 def initialize_screen(level=1):
     if level == 1:
-        for i in range(6):
-            target_dic[i] = Target(70 * i, 50, 2, i)
+        populate_level_1()
+    if level == 2:
+        populate_level_2()
+
+def check_advance():
+    global current_level
+    if len(target_dic) == 0:
+        time.sleep(1)
+        current_level += 1
+        return True
 
 
 def populate_screen(level=1):
@@ -310,6 +332,10 @@ while not done:
             ball.speed[1] *= result[1]
             ball.speed[0] *= result[2]
         ball.move()
+        # check advance
+        print(current_level)
+        if check_advance():
+            initialize_screen(current_level)
 
 
     # --- Drawing Code
