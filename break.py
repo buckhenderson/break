@@ -198,7 +198,7 @@ def check_target(target_area, ball):
             collision_0 = True
             score += 1
             v = -1
-        if target_dic[key].y_pos - ball.height <= ball.y_pos <= target_dic[key].y_pos + target_dic[key].height + ball.height \
+        if target_dic[key].y_pos - ball.height <= ball.y_pos <= target_dic[key].y_pos + target_dic[key].height \
             and (target_dic[key].x_pos - ball.width <= ball.x_pos <= target_dic[key].x_pos
                  or target_dic[key].x_pos + target_dic[key].width - abs(ball.speed[0]) <= ball.x_pos <= target_dic[key].x_pos + target_dic[key].width):
             print('collision detected - horizontal')
