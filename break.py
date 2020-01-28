@@ -67,22 +67,23 @@ def get_target_area(target_dic):
 
 
 def populate_level_1():
-    for i in range(5):
+    for i in range(1):
         target_dic[i] = Target(70 * i, 50, 1, i)
 
 
 def populate_level_2():
     print('populating level 2')
-    for i in range(10):
+    i = 0
+    while i < 10:
         target_dic[i] = Target(70 * i, 50, 2, i)
-    for i in range(10):
-        target_dic[i] = Target(70 * i, 70, 2, i)
+        i += 1
+    while i < 20:
+        target_dic[i] = Target(70 * (i - 10), 70, 2, i)
+        i += 1
+
 
 def initialize_screen(level=1):
-    if level == 1:
-        populate_level_1()
-    if level == 2:
-        populate_level_2()
+    populate_dic[level]()
 
 def check_advance():
     global current_level
@@ -201,16 +202,16 @@ def check_target(target_area, ball):
                 target_dic[key].y_pos - ball.height <= ball.y_pos <= target_dic[key].y_pos or
                 target_dic[key].y_pos + target_dic[key].height - abs(ball.speed[1]) <= ball.y_pos <=
                 target_dic[key].y_pos + target_dic[key].height):
-            print('collision detected - vertical')
-            print('ball location: x_pos = {}, y_pos = {}'.format(ball.x_pos, ball.y_pos))
-            print('target location: x_pos = {}, y_pos = {}, width = {}, height = {}'.format(target_dic[key].x_pos,
-                                                                                            target_dic[key].y_pos,
-                                                                                            target_dic[key].width,
-                                                                                            target_dic[key].height))
-            if target_dic[key].y_pos - ball.height <= ball.y_pos <= target_dic[key].y_pos:
-                print('top')
-            if target_dic[key].y_pos + target_dic[key].height - abs(ball.speed[1]) <= ball.y_pos <= target_dic[key].y_pos + target_dic[key].height:
-                print('bottom')
+            # print('collision detected - vertical')
+            # print('ball location: x_pos = {}, y_pos = {}'.format(ball.x_pos, ball.y_pos))
+            # print('target location: x_pos = {}, y_pos = {}, width = {}, height = {}'.format(target_dic[key].x_pos,
+            #                                                                                 target_dic[key].y_pos,
+            #                                                                                 target_dic[key].width,
+            #                                                                                 target_dic[key].height))
+            # if target_dic[key].y_pos - ball.height <= ball.y_pos <= target_dic[key].y_pos:
+            #     print('top')
+            # if target_dic[key].y_pos + target_dic[key].height - abs(ball.speed[1]) <= ball.y_pos <= target_dic[key].y_pos + target_dic[key].height:
+            #     print('bottom')
             # print('test used to detect collision:')
             # print('(target_dic[key].x_pos - ball.width <= ball.x_pos <= target_dic[key].x_pos + paddle.width) and ball.y_pos <= target_dic[key].y_pos + target_dic[key].height')
             # print('subbed values:')
@@ -223,12 +224,12 @@ def check_target(target_area, ball):
         if target_dic[key].y_pos - ball.height <= ball.y_pos <= target_dic[key].y_pos + target_dic[key].height \
             and (target_dic[key].x_pos - ball.width <= ball.x_pos <= target_dic[key].x_pos
                  or target_dic[key].x_pos + target_dic[key].width - abs(ball.speed[0]) <= ball.x_pos <= target_dic[key].x_pos + target_dic[key].width):
-            print('collision detected - horizontal')
-            print('ball location: x_pos = {}, y_pos = {}'.format(ball.x_pos, ball.y_pos))
-            print('target location: x_pos = {}, y_pos = {}, width = {}, height = {}'.format(target_dic[key].x_pos,
-                                                                                            target_dic[key].y_pos,
-                                                                                            target_dic[key].width,
-                                                                                            target_dic[key].height))
+            # print('collision detected - horizontal')
+            # print('ball location: x_pos = {}, y_pos = {}'.format(ball.x_pos, ball.y_pos))
+            # print('target location: x_pos = {}, y_pos = {}, width = {}, height = {}'.format(target_dic[key].x_pos,
+            #                                                                                 target_dic[key].y_pos,
+            #                                                                                 target_dic[key].width,
+            #                                                                                 target_dic[key].height))
             collision = True
             collision_0 = True
             score += 1
@@ -238,10 +239,10 @@ def check_target(target_area, ball):
             # if target_dic[key].x_pos + target_dic[key].width - ball.width <= ball.x_pos <= target_dic[key].x_pos + target_dic[key].width:
             #     print('2')
         if collision_0:
-            print('removing target {}'.format(key))
+            # print('removing target {}'.format(key))
             target_dic[key].collision()
-    print('ending list: {}'.format('.'.join([str(x) for x in list(target_dic.keys())])))
-    print('exiting out of target loop')
+    # print('ending list: {}'.format('.'.join([str(x) for x in list(target_dic.keys())])))
+    # print('exiting out of target loop')
     return collision, v, h
 
 
@@ -263,10 +264,15 @@ clock = pygame.time.Clock()
 
 # Hide the mouse cursor
 pygame.mouse.set_visible(0)
-
+populate_dic = {1: populate_level_1
+                , 2: populate_level_2}
 paddle = Paddle()
 ball = Ball()
 initialize_screen(1)
+
+
+def initialize_screen(level=1):
+    populate_dic[level]()
 
 # find target with max y_pos
 max_y_pos = 0
@@ -325,17 +331,17 @@ while not done:
             check_paddle(paddle, ball)
         if ball.y_pos < max_y_pos:
             result = check_target(target_area, ball)
-            print('ball location: x_pos = {}, y_pos = {}'.format(ball.x_pos, ball.y_pos))
+            # print('ball location: x_pos = {}, y_pos = {}'.format(ball.x_pos, ball.y_pos))
         if result[0]:
-            print('flipped')
-            print(result)
+            # print('flipped')
+            # print(result)
             ball.speed[1] *= result[1]
             ball.speed[0] *= result[2]
         ball.move()
         # check advance
-        print(current_level)
         if check_advance():
             initialize_screen(current_level)
+            ball = Ball()
 
 
     # --- Drawing Code
@@ -354,12 +360,12 @@ while not done:
 
     # for debugging, we want to print
 
-    if i % 1 == 0:
-        dateTimeObj = datetime.now()
-        timestampStr = dateTimeObj.strftime("%m_%d_%Y_%H_%M_%S_%f")
-        if ball.y_pos < max_y_pos:
-            print('{}, x: {}, y: {}'.format(timestampStr, ball.x_pos, ball.y_pos))
-            pygame.image.save(screen, "C:/breakout/screenshot" + timestampStr + ".jpg")
+    # if i % 1 == 0:
+    #     dateTimeObj = datetime.now()
+    #     timestampStr = dateTimeObj.strftime("%m_%d_%Y_%H_%M_%S_%f")
+    #     if ball.y_pos < max_y_pos:
+    #         print('{}, x: {}, y: {}'.format(timestampStr, ball.x_pos, ball.y_pos))
+    #         pygame.image.save(screen, "C:/breakout/screenshot" + timestampStr + ".jpg")
 
     # Limit frames per second
     clock.tick(60)
